@@ -1,0 +1,1 @@
+# Note: this static/ directory must exist so that the Azure deployment can collect and serve statics from here.

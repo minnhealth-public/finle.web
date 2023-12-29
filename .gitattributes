@@ -1,0 +1,6 @@
+# Track all .zip files with git lfs
+*.zip filter=lfs diff=lfs merge=lfs -text
+
+# .sh files must only have unix file endings so that they run in local docker instances
+*.sh text eol=lf
+git status
