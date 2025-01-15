@@ -1,0 +1,8 @@
+<h2>Unused Key Takeaways Warnings</h2>
+<ul>
+    {% for warning in warnings %}
+    <li>
+        <a target="_blank" href="/admin/app_web/keytakeaway/{{warning.takeaway_id}}/change/">{{warning.takeaway_text}}</a>
+    </li>
+    {% endfor %}
+</ul>

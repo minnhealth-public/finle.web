@@ -1,0 +1,14 @@
+Hello,
+
+You recently requested to recover your account on {{FRONT_END_HOST_URL}}.
+
+To proceed with the account recovery process, please click on the following link or copy it into your browser's address bar:
+
+{{FRONT_END_HOST_URL}}/account/recover/reset?token={{RECOVERY_TOKEN}}
+
+Please note that the recovery token will expire in ten minutes. If the token expires, you can request a new one.
+
+If you did not request this, please ignore this email. Your account is secure.
+
+Thank you,
+{{COMPANY}}

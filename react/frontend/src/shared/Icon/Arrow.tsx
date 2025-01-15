@@ -5,13 +5,11 @@ interface ArrowProps {
     right?: boolean
 }
 
-const Arrow: React.FC<ArrowProps> = ({className, right}) => {
+const Arrow: React.FC<ArrowProps> = () => {
     return (
-        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" className={`${className} ${right?"": "rotate-180"}`}
-             viewBox="0 0 16 16">
-            <path fillRule="evenodd"
-                  d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
-        </svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="86" height="86" viewBox="0 0 86 86" fill="none">
+    <path fill="currentColor" d="M45.0756 17.9623L69.5664 42.4476L66.5098 45.5042L45.7055 24.7053L45.7055 68.4722L41.3836 68.4722L41.3836 24.7053L20.5793 45.5042L17.5227 42.4476L42.019 17.9623C42.8626 17.1187 44.232 17.1187 45.0756 17.9623Z" />
+</svg>
     );
 }
 

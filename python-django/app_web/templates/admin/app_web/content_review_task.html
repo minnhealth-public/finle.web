@@ -1,0 +1,112 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls static tz %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+    &rsaquo; <a href="/admin/content-review-dashboard/">Content Review Dashboard</a>
+    &rsaquo; {% if has_view_permission %}<a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %}
+    &rsaquo; {% if add %}{% blocktranslate with name=opts.verbose_name %}Add {{ name }}{% endblocktranslate %}{% else %}{{ original|truncatewords:"18" }}{% endif %}
+</div>
+{% endblock %}
+
+{% block pretitle %}
+    <a href="{% url opts|admin_urlname:'changelist' %}">< Back</a>
+{% endblock %}
+
+{% block content_title %}
+<div class="review-request-title-div">
+    <h1 class="h1-title">{{ original|truncatewords:"18" }}</h1>
+    {% if obj.date_resolved %}
+        Closed on {{ obj.date_resolved }}
+    {% else %}
+        <input id="close-request-button" type="button" onclick="showConfirmationModal()" value="Close Request">
+    {% endif %}
+
+    <!-- Close request confirmation modal -->
+    <div id="confirmation-modal" class="modal">
+      <div class="modal-content">
+        <p>Are you sure you want to close this request?</p>
+        <button class="close-confirmation-button" onclick="closeRequest('task', '{{ obj.id }}')">Yes</button>
+        <button class="close-confirmation-button" onclick="hideConfirmationModal()">No</button>
+      </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content_subtitle %}
+    <div class="note-card">
+    {% if obj.note %}
+        {% timezone "America/Chicago" %}
+            <p class="review-timestamp">{{ obj.date_issued }}</p>
+        {% endtimezone %}
+        <p>{{ obj.note }}</p>
+    {% else %}
+        <p>This request does not contain a note.</p>
+    {% endif %}
+    </div>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="clip-info">
+        <p><span class="info-label">Title: </span>{{ obj.task.title }}</p>
+        <p><span class="info-label">Short Description: </span>{{ obj.task.short_description }}</p>
+        <p><span class="info-label">Full Description: </span>{{ obj.task.full_description|safe }}</p>
+        <p><span class="info-label">Topic: </span>{{ obj.task.topic }}</p>
+        <p><span class="info-label">Ranking: </span>{{ obj.task.ranking }}</p>
+        <p><span class="info-label"># of Required Fields: </span>{{ num_required_fields }}</p>
+        <p><span class="info-label">Related Glossary Terms: </span>{% if obj.task.related_terms.all|length == 0 %}This task does not have any related glossary terms.{% endif %}</p>
+        <ul>
+            {% for term in obj.task.related_terms.all %}
+                <li>{{ term.term }}</li>
+            {% endfor %}
+        </ul>
+        <p><span class="info-label">Related Tags: </span>{% if obj.task.related_tags.all|length == 0 %}This task does not have any related tags.{% endif %}</p>
+        <ul>
+            {% for tag in obj.task.related_tags.all %}
+                <li>{{ tag }}</li>
+            {% endfor %}
+        </ul>
+        <p><span class="info-label">Related Resources: </span>{% if obj.task.related_resources.all|length == 0 %}This task does not have any related resources.{% endif %}</p>
+        <ul>
+            {% for resource in obj.task.related_resources.all %}
+                <li>{{ resource.title }}: <a href="{{ resource.link }}" target="_blank">{{ resource.link }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div>
+        <hr>
+        <h1 class="past-reviews-title">Reviews</h1>
+        {% if not obj.date_resolved %}
+            <button onclick="addReview()" id="add-review-button">Add Review</button>
+        {% endif %}
+        <form id="new-review-form" class="hidden">
+            <textarea type="text" name="new_review_note" placeholder="Type your note here..." rows="2" id="new-review-note"></textarea>
+            <input id="submit-review-button" type="button" onclick="submitReview('{{ user.id }}', 'task', '{{ obj.id }}')" value="Submit Review">
+        </form>
+        <div id="all-past-reviews">
+            {% for review in past_reviews %}
+                <div class="note-card">
+                    {% timezone "America/Chicago" %}
+                        <p class="review-timestamp">{{ review.timestamp }}</p>
+                    {% endtimezone %}
+                    <p>{{ review.note }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{#CSS#}
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'content_review.css' %}">
+{% endblock %}
+
+{# JS#}
+{% block footer %}
+    {{ block.super }}
+    <script src="{% static 'content_review.js' %}"></script>
+{% endblock %}

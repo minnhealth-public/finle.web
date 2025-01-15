@@ -1,15 +1,21 @@
-import React, {SyntheticEvent, useEffect, useState} from "react";
-import {SearchIcon} from "../Icon";
+import React, { ForwardedRef, SyntheticEvent, forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import MagnifyingGlassIcon from "../Icon/MagnifyingGlassIcon";
 
 interface SearchInputProps {
-    searchParamName?: string
+  searchParamName?: string
 }
 
-const SearchInput: React.FC<SearchInputProps> = ({searchParamName}) => {
+const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>((
+  { searchParamName },
+  ref: ForwardedRef<HTMLInputElement>
+) => {
+  const inputRef = useRef(null);
   const [paramName] = useState<string>((searchParamName || "query"));
-  let [searchParams, setSearchParams] = useSearchParams();
-  const [searchQuery, setSearchQuery] = useState<string>(searchParams.get(paramName));
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(null);
+
+  useImperativeHandle(ref, () => inputRef.current, []);
 
   const onSubmitSearch = (e: SyntheticEvent): void => {
     e.preventDefault();
@@ -20,6 +26,9 @@ const SearchInput: React.FC<SearchInputProps> = ({searchParamName}) => {
     if (!value) searchParams.delete(paramName);
     setSearchParams(searchParams);
   }
+  useEffect(() => {
+    inputRef.current.value = searchParams.get(paramName);
+  }, []);
 
   useEffect(() => {
     // Create a timer variable to store the setTimeout ID
@@ -30,8 +39,8 @@ const SearchInput: React.FC<SearchInputProps> = ({searchParamName}) => {
 
     // Set a new timer to execute the 'bob' function after 2 seconds of typing inactivity
     timer = setTimeout(() => {
-      searchParams.set(paramName, searchQuery);
-      if (!searchQuery) searchParams.delete(paramName);
+      searchParams.set(paramName, inputRef.current.value);
+      if (!inputRef.current.value) searchParams.delete(paramName);
       setSearchParams(searchParams);
     }, 1000);
 
@@ -41,26 +50,33 @@ const SearchInput: React.FC<SearchInputProps> = ({searchParamName}) => {
     };
   }, [searchQuery, searchParams]);
 
-
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value);
-  };
+  const handleInputChange = (evt) => {
+    setSearchQuery(evt.target.value);
+  }
 
   return (
-    <form className="rounded-md relative" onSubmit={onSubmitSearch}>
-      <input
-        type="text"
-        placeholder="Search"
-        name="query"
-        value={searchQuery || ''}
-        onChange={handleInputChange}
-        className="rounded-md w-64 pl-4 py-2 text-black"
-      />
-      <button type="submit" className="absolute top-3 right-4 text-gray-400">
-        <SearchIcon />
-      </button>
-    </form>
+    <search className="relative" onSubmit={onSubmitSearch}>
+
+      <label
+        id="video-search"
+        className={`py-2 text-gray-400 text-md`}
+      >
+        <input
+          ref={inputRef}
+          type="text"
+          placeholder="Type to search..."
+          name="query"
+          onChange={handleInputChange}
+          className={`w-full rounded-md pl-4 py-2 text-gray-400 box-border border-2 border-gray-400 placeholder:text-lg`}
+        />
+
+
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 w-4">
+          <MagnifyingGlassIcon />
+        </div>
+      </label>
+    </search>
   );
-}
+})
 
 export default SearchInput;

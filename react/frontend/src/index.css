@@ -2,6 +2,276 @@
 @tailwind utilities;
 @tailwind components;
 
+#root {
+    height: 100%;
+    width: 100%;
+}
+
+html,
 body {
-    font-family: 'Open Sans', sans-serif;
+    margin: 0;
+    scroll-behavior: smooth;
+    @apply font-arial
+}
+
+body, button, a {
+    @apply font-sans
+}
+
+/* Input sections */
+
+.todo-full-description input, textarea {
+    padding: .75em;
+    margin-right: 8px !important;
+    border-radius: 8px;
+    border: 2px solid theme('colors.gray.350');
+}
+
+.todo-full-description label {
+    margin: 1em 0;
+}
+
+/* Overrides bootstraps list styles */
+ul, ol {
+    margin: 10px;
+    padding-left: 3vw;
+}
+ul {
+    list-style: disc;
+}
+ol {
+    list-style: decimal;
+}
+
+textarea:focus,
+textarea:hover,
+input:focus,
+input[type="text"]:hover {
+    outline: none !important;
+    border: 2px solid theme('colors.primary');
+}
+
+label:has(input[type="text"], input[type="password"], input[type="email"]):has(input:required)::before,
+label:has(input[data-required="true"], textarea[data-required="true"])::before {
+    @apply text-xs hover:text-primary_alt uppercase font-semibold;
+    position: absolute;
+    content: "Required";
+    left: 0px;
+    bottom: -5px;
+}
+
+label:has(input[type="text"], input[type="password"], input[type="email"]):has(input:required),
+label:has(input[data-required="true"], textarea[data-required="true"]) {
+    padding-bottom: 16px;
+}
+
+label {
+    position: relative;
+    display: inline-flex;
+    flex-wrap: wrap;
+}
+
+label:has(> input[type="radio"]) {
+    gap: 0.5rem;
+}
+
+label:has(> input[type="radio"])+label:has(> input[type="radio"]) {
+    margin-left: 1rem;
+}
+
+input {
+    display: inline-block;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border-color: theme('colors.gray.350');
+}
+
+input[type="range"] {
+    @apply accent-primary_alt
+}
+
+input[type="radio"], input[type="checkbox"] {
+    /* Add if not using autoprefixer */
+    -webkit-appearance: none;
+    /* Remove most all native input styles */
+    appearance: none;
+    /* For iOS < 15 */
+    background-color: var(--form-background);
+    /* Not removed via appearance */
+    margin: 0;
+
+    font: inherit;
+    width: 1.5em;
+    height: 1.5em;
+    border: 2px solid theme('colors.gray.350');
+    border-radius: 30%;
+    transform: translateY(-0.075em);
+
+    display: grid;
+    place-content: center;
+}
+
+input[type="radio"]::before {
+    content: "";
+    width: 12px;
+    height: 12px;
+    border-radius: 30%;
+    transform: scale(0);
+    transition: 300ms transform ease-in-out;
+    box-shadow: inset 12px 12px theme('colors.primary');
+    /* Windows High Contrast Mode */
+    background-color: white;
+}
+
+select {
+    option[selected] {
+        background-color: theme('colors.primary');
+        color: white;
+    }
+}
+
+input[type="checkbox"]::before,
+input[type="checkbox"]::after {
+    content: '';
+    position: absolute;
+    width: 60%; /* Relative to checkbox size */
+    height: 10%; /* Thickness of the X */
+    background-color: theme('colors.primary');
+    border-radius: 1.2px;
+    top: 50%; /* Center vertically */
+    left: 50%; /* Center horizontally */
+    box-shadow: 0 0 2px 0 #ccc;
+    transition: 300ms transform ease-in-out;
+}
+
+input[type="checkbox"]:hover::before,
+input[type="checkbox"]:hover::after {
+    transform: translate(-50%, -50%) scale(1); /* Scale on hover */
+}
+
+input[type="checkbox"]::before {
+    transform: rotate(45deg) scale(0); /* Diagonal line 1 */
+}
+
+input[type="checkbox"]::after {
+    transform: rotate(-45deg) scale(0); /* Diagonal line 2 */
+}
+
+input[type="checkbox"]:checked::before {
+    transform: translate(-50%, -50%) rotate(45deg) scale(1); /* Grow line 1 */
+}
+
+input[type="checkbox"]:checked::after {
+    transform: translate(-50%, -50%) rotate(-45deg) scale(1); /* Grow line 2 */
+}
+
+input[type="radio"]:checked::before {
+    transform: scale(1);
+}
+
+input[type="radio"]:focus,
+input[type="radio"]:hover,
+input[type="checkbox"]:focus,
+input[type="checkbox"]:hover {
+    border: 2px solid theme('colors.primary');
+}
+
+/* End input section */
+
+/* Dialog prevent scroll*/
+body:has(dialog[open][data-id="modal"]) {
+    overflow: hidden;
+}
+
+/* Dialog end */
+
+@layer base {
+    html {
+        @apply text-black;
+    }
+}
+
+@layer components {
+    .btn-primary {
+        @apply cursor-pointer text-xs bg-primary hover:bg-primary_alt focus:bg-primary_alt focus-visible:bg-primary_alt active:bg-primary_alt rounded-lg border-2 border-transparent py-2 px-6 text-white-1 font-semibold uppercase transition duration-300;
+    }
+
+    .btn-secondary {
+        @apply bg-white-1 uppercase text-xs hover:bg-gray-350 focus:bg-gray-350 active:bg-gray-350 text-gray-350 hover:text-white-1 active:text-white-1 focus:text-white-1 py-2 px-6 border-gray-350 border-2 font-semibold rounded-lg transition duration-300 box-border;
+    }
+
+    .btn-sso {
+        @apply bg-white-1 uppercase text-xs hover:bg-gray-350 focus:bg-gray-350 active:bg-gray-350 text-gray-350 hover:text-white-1 active:text-white-1 focus:text-white-1 py-2 px-6 border-gray-350 border-2 font-semibold rounded-lg transition duration-300 box-border;
+    }
+
+    .link-primary {
+        @apply cursor-pointer text-primary hover:text-primary_alt focus:text-primary_alt focus-visible:text-primary_alt active:bg-primary_alt text-xl font-bold uppercase transition duration-300;
+    }
+
+    .nav-link {
+        @apply hover:text-primary_alt active:text-primary_alt text-black transition duration-300;
+    }
+
+    .input-field {
+        @apply border-2 rounded-md p-3 w-full
+    }
+
+    .todo-full-description>input[type="text"], textarea {
+        @apply border-2 rounded-md p-3
+    }
+
+    input::placeholder {
+        @apply font-semibold text-xs
+    }
+
+}
+
+
+/* Load in font faces */
+@font-face {
+    font-family: "Open Sans";
+    src: url("/fonts/OpenSans-Regular.ttf");
+    font-style: normal;
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: "Open Sans";
+    src: url("/fonts/OpenSans-Italic.ttf");
+    font-style: italic;
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: "Open Sans";
+    src: url("/fonts/OpenSans-Light.ttf");
+    font-style: light;
+    font-weight: 100;
+}
+
+@font-face {
+    font-family: "Open Sans";
+    src: url("/fonts/OpenSans-Medium.ttf");
+    font-style: medium;
+    font-weight: 500;
+}
+
+@font-face {
+    font-family: "Open Sans";
+    src: url("/fonts/OpenSans-SemiBold.ttf");
+    font-weight: 600;
+}
+
+@font-face {
+    font-family: "Open Sans";
+    src: url("/fonts/OpenSans-Bold.ttf");
+    font-style: bold;
+    font-weight: 700;
+}
+
+@font-face {
+    font-family: "Open Sans";
+    src: url("/fonts/OpenSans-ExtraBold.ttf");
+    font-weight: 800;
 }

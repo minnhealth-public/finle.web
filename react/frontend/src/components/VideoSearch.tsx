@@ -15,8 +15,7 @@ export const VideoSearch: React.FC<VideoCardProps> = ({allVideos}) => {
         const value: string = target.query.value;
 
         //TODO use url to set the search for over views to grab to make this easier no need to pass around state if it's in the url
-        const videoSearchResults: Video[] = allVideos.filter((video: Video) => video.name.toLowerCase().includes(value.toLowerCase()) ||
-                                    video.description.toLowerCase().includes(value.toLowerCase())
+        const videoSearchResults: Video[] = allVideos.filter((video: Video) => video.name.toLowerCase().includes(value.toLowerCase())
         );
 
         searchParams.set("query", value);

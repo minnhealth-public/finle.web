@@ -1,0 +1,12 @@
+<h3>{{ model }}
+    {% if not warnings %}
+    <span><i> - no warnings </i></span>
+    {% endif %}
+</h3>
+<ul>
+    {% for warning in warnings %}
+    <li>
+        <a target="_blank" href="/admin/app_web/{{warning.model}}/{{warning.id}}/change/">{{warning.url}}</a>
+    </li>
+    {% endfor %}
+</ul>

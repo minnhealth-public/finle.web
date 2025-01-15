@@ -1,0 +1,110 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{% block content_title %}
+<div id="dashboard-title">
+    <h1 class="h1-title">{{ title }}</h1>
+</div>
+{% endblock %}
+
+{% block content %}
+
+<div hx-get="/api/shorts/check-duplicate-names/" hx-trigger="load" hx-indicator="#spinner">
+</div>
+
+<h2>Link Warnings</h2>
+<p>These are just warnings it is possible the link is working. So please check yourself before changing the url.</p>
+<div hx-get="/api/glossary/check-links/" hx-trigger="load" hx-indicator="#spinner">
+</div>
+<div hx-get="/api/videos/check-links/" hx-trigger="load" hx-indicator="#spinner">
+</div>
+<div hx-get="/api/resources/check-links/" hx-trigger="load" hx-indicator="#spinner">
+</div>
+<div hx-get="/api/partners/check-links/" hx-trigger="load" hx-indicator="#spinner">
+</div>
+
+<svg id="spinner" class="htmx-indicator" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
+    viewBox="0 0 24 24">
+    <path fill="currentColor"
+        d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
+        <animateTransform attributeName="transform" dur="0.75s" repeatCount="indefinite" type="rotate"
+            values="0 12 12;360 12 12" />
+    </path>
+</svg>
+
+<div hx-get="/api/takeaways/unused/" hx-trigger="load" hx-indicator="#spinner">
+</div>
+
+<h2>Data Backups</h2>
+<a id="export-backup-button" class="dashboard-button" href="{% url 'backup_to_excel' %}?source=2">Database</a>
+<a id="export-backup-button" class="dashboard-button" href="{% url 'backup_to_excel' %}?source=1">Google Sheets</a>
+
+<h2>Curation Audit Comparison</h2>
+<p>This table only shows and merges the elements that have no violations.</p>
+<svg id="table-spinner" class="htmx-indicator" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
+    viewBox="0 0 24 24">
+    <path fill="currentColor"
+        d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
+        <animateTransform attributeName="transform" dur="0.75s" repeatCount="indefinite" type="rotate"
+            values="0 12 12;360 12 12" />
+    </path>
+</svg>
+<div id="compare-call" hx-get="/admin/curator-audit/compare" hx-trigger="load, load-database" hx-indicator="#table-spinner"></div>
+
+{% endblock %}
+
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    th {
+        text-align: center;
+    }
+    th, td {
+        border: 1px solid black;
+    }
+    .dashboard-button {
+        margin-bottom: 10px;
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+    #merge-sheet-to-db-button {
+        background-color: #4CAF50;
+    }
+    #merge-sheet-to-db-button:hover {
+        background-color: #45a049;
+        transform: translateY(-2px);
+    }
+    #merge-db-to-sheet-button {
+        background-color: #4FB0C6;
+    }
+    #merge-db-to-sheet-button:hover {
+        background-color: #3CA2B9;
+        transform: translateY(-2px);
+    }
+    #export-backup-button {
+        background-color: #FFA500;
+        color: white;
+    }
+    #export-backup-button:hover {
+        background-color: #FF8C00;
+        transform: translateY(-2px);
+    }
+
+</style>
+{% endblock %}
+
+{# JS#}
+{% block footer %}
+{{ block.super }}
+<script src="{% static 'htmx.min.js' %}"></script>
+{% endblock %}

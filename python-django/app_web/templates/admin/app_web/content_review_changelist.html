@@ -1,0 +1,42 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls static %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+    &rsaquo; <a href="/admin/content-review-dashboard/">Content Review Dashboard</a>
+    &rsaquo; {{ cl.opts.verbose_name_plural|capfirst }}
+</div>
+{% endblock %}
+
+{% block pretitle %}
+    <a href="/admin/content-review-dashboard/">< Back</a>
+{% endblock %}
+
+{% block content_title %}
+    <div class="review-request-title-div">
+        <h1 class="h1-title">{{ cl.opts.verbose_name_plural|capfirst }}</h1>
+        <p class="total-open-reviews">
+            {% if total_num_need_review > 0 %}
+                <span style="color: red">
+                    {{ total_num_need_review }}
+                </span> {{ model_name_plural }} need review.
+            {% else %}
+                No open requests.
+            {% endif %}
+        </p>
+    </div>
+    <div>
+
+    </div>
+{% endblock %}
+
+{% block content %}
+    {{ block.super }}
+{% endblock %}
+
+{#CSS#}
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'content_review.css' %}">
+{% endblock %}

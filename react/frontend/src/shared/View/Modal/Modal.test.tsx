@@ -1,29 +1,31 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { render, fireEvent, screen } from '@testing-library/react';
 import Modal from './Modal';
 
 describe('Modal Component', () => {
-  test('renders Modal component when isOpen is true', () => {
-    const {getByTestId} = render(<Modal isOpen={true} onClose={() => {}}/>);
-    // Assert that the modal is rendered.
-    expect(getByTestId('modal')).toBeTruthy();
-  });
+  test('Ensure showModal', () => {
+    const modalRef = React.createRef();
+    render(<div>
+      <button onClick={() => modalRef.current.showModal()}>Open</button>
+      <Modal ref={modalRef} onClose={() => { }} />
+    </div>);
 
-  test('does not render Modal component when isOpen is false', () => {
-    const {queryByTestId} = render(<Modal isOpen={false} onClose={() => {}} />);
+    fireEvent.click(screen.getByText('Open'));
     // Assert that the modal is not rendered.
-    expect(queryByTestId('modal')).toBeNull();
+    expect(HTMLDialogElement.prototype.showModal).toHaveBeenCalled()
   });
 
   test('calls onClose when close button is clicked', () => {
+
     const onCloseMock = jest.fn();
-    const {getByRole} = render(<Modal isOpen={true} onClose={onCloseMock} />);
+    render(<Modal onClose={onCloseMock} />);
 
     // Click the close button.
-    fireEvent.click(getByRole('button'));
+    fireEvent.click(screen.getByLabelText('close'));
 
     // Assert that onClose was called.
     expect(onCloseMock).toHaveBeenCalled();
+    expect(HTMLDialogElement.prototype.close).toHaveBeenCalled()
   });
 
   // Add more test cases based on your component's behavior.

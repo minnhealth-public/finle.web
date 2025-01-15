@@ -1,6 +1,4 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faStar } from '@fortawesome/free-solid-svg-icons';
 
 interface ClipRatingProps {
   shortId: string;
@@ -29,7 +27,6 @@ const ClipRating: React.FC<ClipRatingProps> = ({ shortId, currentRating }) => {
     <div>
       {[1, 2, 3, 4, 5].map(val => (
         <button key={val} onClick={() => saveRating(val)} className="rating-button">
-          <FontAwesomeIcon icon={faStar} className={val <= rating ? 'rating-color' : 'none'} />
         </button>
       ))}
       <p><i>How helpful was this video?</i></p>

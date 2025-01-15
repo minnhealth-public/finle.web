@@ -1,19 +1,29 @@
 {
     "compilerOptions": {
-    "module": "system",
-    "esModuleInterop": true,
-    "jsx": "react",
-    "moduleResolution": "nodenext",
-    "noImplicitAny": true,
-    "removeComments": true,
-    "preserveConstEnums": true,
-    "outFile": "../../built/local/tsc.js",
-    "sourceMap": true,
-    //"target": "es6",
-    //"lib": [
-    //  "dom.iterable"
-    //]
-  },
-  "include": ["src/**/*"],
-  "exclude": ["**/*.spec.ts"]
+        "module": "system",
+        "esModuleInterop": true,
+        "jsx": "react",
+        "moduleResolution": "nodenext",
+        "noImplicitAny": true,
+        "removeComments": true,
+        "allowImportingTsExtensions": true,
+        "preserveConstEnums": true,
+        "outFile": "../../built/local/tsc.js",
+        "sourceMap": true,
+        "types": [
+            "node",
+            "vite/client"
+        ],
+        //"target": "es6",
+        "lib": [
+            "WebWorker"
+        ]
+    },
+    "include": [
+        "src/**/*",
+        "vite.config.*"
+    ],
+    "exclude": [
+        "**/*.spec.ts"
+    ]
 }

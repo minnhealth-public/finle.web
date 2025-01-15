@@ -10,9 +10,9 @@ interface GlossaryLetterGroupingProps {
 const GlossaryLetterGrouping: React.FC<GlossaryLetterGroupingProps> = ({ letter, terms}) => {
   return (
     <div className="flex flex-col">
-      <h3 className="font-normal text-xl">{letter}</h3>
-      {terms.map((item) =>
-        <GlossaryListItem key={item.id} item={item}/>
+      <h3 className="font-normal text-2xl">{letter}</h3>
+      {terms.map((item, index) =>
+        <GlossaryListItem key={item.id} item={item} idx={index} />
       )}
     </div>
   );

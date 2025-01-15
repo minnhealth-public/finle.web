@@ -1,11 +1,10 @@
-import axios from 'axios';
-
+import axios, { AxiosInstance } from 'axios';
 
 export default axios.create({
-    baseURL: process.env.REACT_APP_BACKEND_HOST
+  baseURL: process.env.VITE_REACT_APP_BACKEND_HOST
 })
 
-export const axiosPrivate = axios.create({
-    baseURL: process.env.REACT_APP_BACKEND_HOST,
-    withCredentials: true
+export const axiosPrivate: AxiosInstance = axios.create({
+  baseURL: process.env.VITE_REACT_APP_BACKEND_HOST,
+  withCredentials: true
 })
