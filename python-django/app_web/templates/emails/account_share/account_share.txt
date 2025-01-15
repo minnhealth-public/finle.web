@@ -1,0 +1,7 @@
+Hello,
+
+You have been granted access to {{COMPANY}}. To access your new account, please click on the following link:
+{{FRONT_END_HOST_URL}}/token-login?access={{TOKEN}}
+
+Thank you,
+{{COMPANY}}

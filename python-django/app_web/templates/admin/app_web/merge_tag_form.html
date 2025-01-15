@@ -1,0 +1,129 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{% block content_title %}
+    <div style="padding-bottom: 5vh">
+        <h1 style="font-weight: bolder; display: inline">{{ title }}</h1>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <form id="merge-tag-form">
+    {% csrf_token %}
+        <label for="select-tag-dropdown">Select the primary tag:</label>
+        <select name="select-tag-dropdown" id="select-tag-dropdown">
+            {% for tag in tags_to_merge %}
+                <option value="{{ tag.id }}">{{ tag }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" id="submit-merge-button">Submit</button>
+    </form>
+
+    <hr>
+
+    {% for tag in tags_to_merge %}
+    <div class="tag-section" data-tag-id="{{ tag.id }}">
+        <h2>{{ tag }}</h2>
+
+        <div>
+            <div class="associations">
+                <h3>Clips</h3>
+                <ul>
+                    {% for clip in tag.clips.all %}
+                        <li><a href="{% url 'admin:app_web_clip_change' clip.id %}" target="_blank">{{ clip.name }}</a></li>
+                    {% endfor %}
+                </ul>
+                {% if tag.clips.all|length == 0 %}
+                    <p>No clips available.</p>
+                {% endif %}
+            </div>
+            <div class="associations">
+                <h3>Tasks</h3>
+                <ul>
+                    {% for task in tag.tasks.all %}
+                        <li><a href="{% url 'admin:app_web_task_change' task.id %}" target="_blank">{{ task.title }}</a></li>
+                    {% endfor %}
+                </ul>
+                {% if tag.tasks.all|length == 0 %}
+                    <p>No tasks available.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <hr>
+    </div>
+    {% endfor %}
+{% endblock %}
+
+{% block footer %}
+    {{ block.super }}
+    <script>
+        function getUnselectedTags(selected) {
+            const unselected_tags = []
+            {% for tag in tags_to_merge %}
+                if ("{{ tag.id }}" !== selected) {
+                    unselected_tags.push("{{ tag.id }}");
+                }
+            {% endfor %}
+            return unselected_tags
+        }
+
+        document.getElementById('merge-tag-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const selected_tag = document.getElementById('select-tag-dropdown').value
+            const unselected_tags = getUnselectedTags(selected_tag)
+            fetch('/admin/merge-tags/submit/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    'selected': parseInt(selected_tag),
+                    'not_selected': unselected_tags
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = document.referrer
+                } else {
+                    console.log(response)
+                }
+            })
+        });
+
+        document.getElementById('select-tag-dropdown').addEventListener('change', function(event) {
+            const selectedTagId = event.target.value;
+            const sections = document.querySelectorAll('.tag-section');
+
+            sections.forEach(section => {
+                if (section.getAttribute('data-tag-id') === selectedTagId) {
+                    section.style.backgroundColor = '#f0f0f0';
+                } else {
+                    section.style.backgroundColor = '';
+                }
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <style>
+        #submit-merge-button {
+            background-color: #417690;
+            border: 1px solid #417690;
+            color: #ffffff;
+            cursor: pointer;
+            padding: 5px 10px;
+            font-size: 14px;
+            border-radius: 4px;
+            margin-bottom: 2vh;
+            margin-left: 2vw;
+        }
+        #submit-merge-button:hover {
+            background-color: #3a6a81;
+            border-color: #345e73;
+        }
+    </style>
+{% endblock %}

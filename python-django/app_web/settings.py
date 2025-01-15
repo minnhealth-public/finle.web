@@ -8,14 +8,22 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
+
+# import the logging library
+import logging
+import os
 from datetime import timedelta
 from pathlib import Path
 
+import certifi
 import sentry_sdk
 from django.conf.global_settings import DATABASES
 from sentry_sdk.integrations.django import DjangoIntegration
 
-from app_web.env import env_get_allowed_hosts, env_get_allowed_origins, env_get_raw_value
+from app_web.env import env_get_allowed_hosts, env_get_allowed_origins, env_get_csrf_trusted_origins, env_get_raw_value
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent
@@ -30,7 +38,8 @@ SECRET_KEY = env_get_raw_value("SECRET_KEY")
 DEBUG = env_get_raw_value("DEBUG") in (True, "True")
 
 ALLOWED_HOSTS = env_get_allowed_hosts()
-# CSRF_TRUSTED_ORIGINS = ['https://financiallegalwebapp.azurewebsites.net']
+CSRF_TRUSTED_ORIGINS = env_get_csrf_trusted_origins()
+USE_X_FORWARDED_HOST = True
 
 # Application definition
 
@@ -47,6 +56,19 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "corsheaders",
+    "ckeditor",
+    "django_object_actions",
+    # all auth apps
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.headless",
+    "allauth.usersessions",
+    # auth providers
+    "allauth.socialaccount.providers.facebook",
+    "allauth.socialaccount.providers.twitter",
+    "allauth.socialaccount.providers.google",
+    "allauth.socialaccount.providers.apple",
 ]
 
 MIDDLEWARE = [
@@ -60,9 +82,12 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
+    # allauth middleware
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = "app_web.urls"
+SITE_ID = 1
 
 TEMPLATES = [
     {
@@ -74,11 +99,14 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                # `allauth` needs this from django
+                "django.template.context_processors.request",
             ],
         },
     },
 ]
-REST_FRAMEWORK = {"DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework_simplejwt.authentication.JWTAuthentication",)}
+REST_FRAMEWORK = {"DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework_simplejwt.authentication.JWTAuthentication",
+                                                     "rest_framework.authentication.SessionAuthentication")}
 
 SIMPLE_JWT = {
     # It will work instead of the default serializer(TokenObtainPairSerializer).
@@ -110,23 +138,105 @@ DATABASES["default"] = {
     "PORT": 5432,  # default postgres port must be open when running docker locally
 }
 
+
+# CKEditor configs
+CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"
+
+CKEDITOR_CONFIGS = {
+    "default": {
+        "toolbar_YourCustomToolbarConfig": [
+            {"name": "clipboard", "items": ["Cut", "Copy", "Paste", "PasteText", "PasteFromWord", "-", "Undo", "Redo"]},
+            {"name": "editing", "items": ["Find", "Replace", "-", "SelectAll"]},
+            {"name": "forms", "items": ["Checkbox", "Radio", "TextField", "Textarea", "Select"]},
+            "/",
+            {"name": "basicstyles", "items": ["Bold", "Italic", "Underline", "Strike"]},
+            {
+                "name": "paragraph",
+                "items": [
+                    "NumberedList",
+                    "BulletedList",
+                    "-",
+                    "Outdent",
+                    "Indent",
+                    "-",
+                    "Blockquote",
+                    "CreateDiv",
+                    "-",
+                    "JustifyLeft",
+                    "JustifyCenter",
+                    "JustifyRight",
+                    "JustifyBlock",
+                ],
+            },
+            {"name": "links", "items": ["Link", "Unlink", "Anchor"]},
+            {"name": "styles", "items": ["Format"]},
+            "/",  # put this to force next toolbar on new line
+            {
+                "name": "yourcustomtools",
+                "items": [
+                    # put the name of your editor.ui.addButton here
+                    "Preview",
+                    "Maximize",
+                ],
+            },
+        ],
+        "format_tags": "p;h1;h2",  # entries is displayed in "Paragraph format"
+        "format_p": {
+            "name": "normal",
+            "element": "p",
+            "styles": {
+                "font-family": '"Open Sans", sans-serif',
+            },
+        },
+        "format_h1": {
+            "name": "Header 1",
+            "element": "h1",
+            "styles": {
+                "font-size": "4.5rem",
+                "color": "rgb(0, 115, 152)",
+                "font-family": '"Arial Rounded MT Bold", serif',
+                "font-weight": "400",
+            },
+        },
+        "format_h2": {
+            "name": "Header 2",
+            "element": "h2",
+            "styles": {
+                "font-size": "1.875rem",
+                "color": "rgb(0, 115, 152)",
+                "font-family": '"Arial Rounded MT Bold", serif',
+                "font-weight": "400",
+            },
+        },
+        "toolbar": "YourCustomToolbarConfig",  # put selected toolbar config here
+        "extraPlugins": "forms,div,formmodplugin",
+        "allowContent": True,
+        "extraAllowedContent": "input[data-*];textarea[data-*]",
+        "removePlugins": "exportpdf, stylesheetparser",
+        # CKEDITOR.plugins.addExternal(...)
+        "external_plugin_resources": [("formmodplugin", "/static/", "formModPlugin.js")],
+    },
+}
+
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-    },
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    # allauth authentications
+    "allauth.account.auth_backends.AuthenticationBackend",
 ]
+
+HEADLESS = True
+HEADLESS_ONLY = True
+HEADLESS_FRONTEND_URLS = {
+    "account_confirm_email": "/account/verify-email/{key}",
+    "account_reset_password": "/account/password/reset",
+    "account_reset_password_from_key": "/account/password/reset/key/{key}",
+    "account_signup": "/account/signup",
+    "socialaccount_login_error": "/account/provider/error",
+}
+SOCIALACCOUNT_ADAPTER = "app_web.views.auth.service.FinleSocialAccountAdapter"
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -145,6 +255,12 @@ LOGGING = {
             "class": "logging.StreamHandler",
         },
     },
+    "loggers": {
+        # "django.db.backends": {
+        #    "level": "DEBUG",
+        #    "handlers": ["console"],
+        # },
+    },
     "root": {
         "handlers": ["console"],
         "level": "WARNING",
@@ -160,29 +276,13 @@ STATIC_URL = "static/"
 MEDIA_ROOT = "app_web/media"
 MEDIA_URL = "media/"
 
+# Silence ckeditor warning since it is only used in the admin page
+SILENCED_SYSTEM_CHECKS = ["ckeditor.W001"]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-sentry_uri = env_get_raw_value("SENTRY_URI")
-if sentry_uri.startswith("https://"):
-    # Sentry error/crash reporting collection system configuration.
-    # To log in to the Sentry dashboard, visit:
-    # https://minnhealth.sentry.io/projects/finle-web/?project=4504801381646336
-    sentry_sdk.init(
-        dsn=f"{sentry_uri}",
-        integrations=[
-            DjangoIntegration(),
-        ],
-        # Set traces_sample_rate to 1.0 to capture 100%
-        # of transactions for performance monitoring.
-        # We recommend adjusting this value in production.
-        traces_sample_rate=1.0,
-        # If you wish to associate users to errors (assuming you are using
-        # django.contrib.auth) you may enable sending PII data.
-        send_default_pii=True,
-    )
 
 ACCESS_CONTROL_ALLOW_HEADERS = True
 CORS_ALLOW_HEADERS = (
@@ -193,6 +293,7 @@ CORS_ALLOW_HEADERS = (
     "accept",
     "origin",
     "x-csrftoken",
+    "x-csrf-token",
 )
 
 CORS_ALLOW_CREDENTIALS = True
@@ -200,3 +301,27 @@ CORS_ALLOWED_ORIGINS = env_get_allowed_origins()
 CORS_ALLOW_ALL_ORIGINS = env_get_raw_value("CORS_ALLOW_ALL_ORIGINS") in (True, "True")
 
 AUTH_USER_MODEL = "app_web.User"
+
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/"
+
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+
+# the url for the front end host
+FRONT_END_HOST = env_get_raw_value("FRONT_END_HOST")
+
+# Email settings
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = env_get_raw_value("EMAIL_HOST")
+EMAIL_PORT = env_get_raw_value("EMAIL_PORT")
+EMAIL_HOST_USER = env_get_raw_value("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = env_get_raw_value("EMAIL_HOST_PASSWORD")
+EMAIL_USE_TLS = env_get_raw_value("EMAIL_USE_TLS")
+EMAIL_USE_SSL = False
+
+# Set the env cert file
+os.environ["SSL_CERT_FILE"] = certifi.where()

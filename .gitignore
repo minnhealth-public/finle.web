@@ -15,6 +15,11 @@ __pycache__/
 # C extensions
 *.so
 
+# Local static files
+python-django/app_web/static/*/
+python-django/app_web/lib/
+!python-django/app_web/static/*.js
+
 # Distribution / packaging
 .Python
 build/
@@ -23,7 +28,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
 lib64/
 parts/
 sdist/
@@ -118,6 +122,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+local.env
 
 # Spyder project settings
 .spyderproject

@@ -21,6 +21,7 @@ const mockRelatedTerms: GlossaryItem[] = [
 ];
 
 describe('GlossaryModal', () => {
+
   it('renders the modal with item and related terms', () => {
     render(
       renderWithRouter(<GlossaryModal item={mockItem} relatedTerms={mockRelatedTerms} />)

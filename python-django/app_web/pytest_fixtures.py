@@ -4,7 +4,6 @@ from app_web import models
 
 
 @pytest.fixture(autouse=True)
-@pytest.mark.django_db()
 def finle_standard_user():
     """Create and return a user object with standard privileges."""
     # Setup

@@ -1,0 +1,17 @@
+<h2> Duplicate Clip Name Warnings</h2>
+<p><i>To fix duplicate clip names, include a value in the speaker field.</i>
+</p>
+<h3>Clips
+    {% if not warnings %}
+    <span><i> - no warnings </i></span>
+    {% endif %}
+</h3>
+<ul>
+    {% for warning in warnings %}
+    <li>
+        {{warning.cur_clip_name}}
+        <a target="_blank" href="/admin/app_web/clip/{{warning.cur_clip_id}}/change/">{{warning.cur_clip_id}}</a>
+        <a target="_blank" href="/admin/app_web/clip/{{warning.other_clip_id}}/change/">{{warning.other_clip_id}}</a>
+    </li>
+    {% endfor %}
+</ul>

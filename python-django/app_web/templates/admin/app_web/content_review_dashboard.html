@@ -1,0 +1,64 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{% block content_title %}
+    <div id="dashboard-title">
+        <h1 class="h1-title">{{ title }}</h1>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <a href="/admin/app_web/clipreviewrequest/" class="card-link">
+        <div class="card">
+            <div class="card-content">
+                <h2>Clips</h2>
+                <p>
+                    <span {% if total_num_clips_need_review > 0 %}style="color: red" {% endif %}>
+                        {{ total_num_clips_need_review }}
+                    </span> clips need review.
+                </p>
+            </div>
+        </div>
+    </a>
+    <a href="/admin/app_web/taskreviewrequest/" class="card-link">
+        <div class="card">
+            <div class="card-content">
+                <h2>Tasks</h2>
+                <p>
+                    <span {% if total_num_tasks_need_review > 0 %}style="color: red" {% endif %}>
+                        {{ total_num_tasks_need_review }}
+                    </span> tasks need review.
+                </p>
+            </div>
+        </div>
+    </a>
+    <a href="/admin/app_web/resourcereviewrequest/" class="card-link">
+        <div class="card">
+            <div class="card-content">
+                <h2>Resources</h2>
+                <p>
+                    <span {% if total_num_resources_need_review > 0 %}style="color: red" {% endif %}>
+                        {{ total_num_resources_need_review }}
+                    </span> resources need review.
+                </p>
+            </div>
+        </div>
+    </a>
+    <a href="/admin/app_web/glossarytermreviewrequest/" class="card-link">
+        <div class="card">
+            <div class="card-content">
+                <h2>Glossary Terms</h2>
+                <p>
+                    <span {% if total_num_terms_need_review > 0 %}style="color: red" {% endif %}>
+                        {{ total_num_terms_need_review }}
+                    </span> glossary terms need review.
+                </p>
+            </div>
+        </div>
+    </a>
+{% endblock %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'content_review.css' %}">
+{% endblock %}

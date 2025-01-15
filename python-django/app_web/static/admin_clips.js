@@ -7,8 +7,8 @@
  * @returns {Promise<any>} The options as a JSON array.
  */
 async function fetch_parent_options(video_value, type_value, endpoint_value) {
-    const input = `${endpoint_value}?video=${video_value}&type=${type_value}`;
-    const response = await fetch(input);
+    const input = `${endpoint_value}?video=${video_value}&type=${type_value}&paginate=false`;
+    const response = await fetch(input, {credentials: 'include'});
     return await response.json();
 }
 
@@ -23,7 +23,7 @@ function populate_parent_options(parent, clips) {
     let option_selected = false;
     for (let clip of clips) {
         let selected = '';
-        if (clip.id == parent_value) {
+        if (clip.id === parent_value) {
             selected = ' selected';
             option_selected = true;
         }
@@ -42,11 +42,18 @@ function populate_parent_options(parent, clips) {
  */
 function update_parent_options(video, type, parent, endpoint) {
     const video_value = video.value;
-    const type_value = type.value;
-    if (video_value === '' || type_value === '') {
+    let type_value = type.value;
+    if (video_value === '' || type_value === '' || type_value === 'LONG') {
         populate_parent_options(parent, []);
     } else {
         const endpoint_value = endpoint.value;
+
+        if (type_value === 'SHORT') {
+            type_value = 'MEDIUM';
+        } else if (type_value === 'MEDIUM') {
+            type_value = 'LONG';
+        }
+
         fetch_parent_options(video_value, type_value, endpoint_value).then(
             function (clips) {
                 populate_parent_options(parent, clips);

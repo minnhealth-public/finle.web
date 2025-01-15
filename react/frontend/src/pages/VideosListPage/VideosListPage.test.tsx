@@ -6,32 +6,45 @@ import VideosListPage from './VideosListPage';
 import axios from 'axios';
 import { renderWithClient, renderWithRouter } from '../../testUtils';
 import { Video } from '../../models';
+const nock = require('nock');
 
 // Create a new query client instance
 // Mock data for tags
 let mockVideos: Video[] = [
-    {
-        "id": "16",
-        "name": "Able to Understand Legal and Financial Suggestions",
-        "description": "A dementia diagnosis is a call to action. Once a diagnosis is made, most people are able to work with professionals who can draft legal documents and create financial plans.",
-        "video": "-jJzTHrC3zc",
-        "start_time": 163000000,
-        "end_time": 288000000,
-        "topics_addressed": [],
-        "longer_clip": "2",
-        "entire_clip": "2"
-    },
-    {
-        "id": "13",
-        "name": "Basics Legal Documents",
-        "description": "The basic legal documents everyone should have a durable power of attorney for financial and, its counterpart, the durable power of attorney for healthcare.",
-        "video": "-jJzTHrC3zc",
-        "start_time": 480000000,
-        "end_time": 495000000,
-        "topics_addressed": [],
-        "longer_clip": "2",
-        "entire_clip": "2"
-    },
+  {
+    "id": 16,
+    "type": "SHORT",
+    "name": "Able to Understand Legal and Financial Suggestions",
+    "video": "-jJzTHrC3zc",
+    "videoUrl": "-jJzTHrC3zc",
+    "startTime": 163000000,
+    "endTime": 288000000,
+    "topicsAddressed": [],
+    "longerClip": null,
+    "entireClip": null,
+    "keyTakeaways": [],
+    "tasks": [],
+    "tags": [],
+    "saved": false,
+    "watched": false
+  },
+  {
+    "id": 13,
+    "type": "SHORT",
+    "name": "Basics Legal Documents",
+    "video": "-jJzTHrC3zc",
+    "videoUrl": "-jJzTHrC3zc",
+    "startTime": 480000000,
+    "endTime": 495000000,
+    "topicsAddressed": [],
+    "longerClip": null,
+    "entireClip": null,
+    "keyTakeaways": [],
+    "tasks": [],
+    "tags": [],
+    "saved": false,
+    "watched": false
+  },
 ];
 
 describe('VideosListPage Component', () => {
@@ -49,12 +62,12 @@ describe('VideosListPage Component', () => {
 
   it('renders videos correctly when fetched successfully', async () => {
     // Mock the useQuery hook to return successful state
-    jest.spyOn(axios, 'get').mockReturnValue(Promise.resolve({data: mockVideos}))
+    jest.spyOn(require('../../api/shorts'), 'getShorts').mockResolvedValueOnce(mockVideos);
 
     renderWithClient(renderWithRouter(<VideosListPage />));
 
     // Assert that each tag is displayed
-    for (const videoIdx in mockVideos){
+    for (const videoIdx in mockVideos) {
       expect(await screen.findByText(mockVideos[videoIdx].name)).toBeInTheDocument();
     }
   });

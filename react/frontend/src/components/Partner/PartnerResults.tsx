@@ -19,8 +19,8 @@ const PartnerResults: React.FC = () => {
         return (
           <div key={idx}>
             <div className="py-20 md:flex md:flex-row gap-3">
-              <div className="md:flex  md:w-2/5 my-auto align-middle justify-center text-teal-500 font-bold text-2xl text-center ">
-                <img src={partner.logo}/>
+              <div className="md:flex  md:w-2/5 my-auto align-middle justify-center text-primary_alt font-bold text-2xl text-center ">
+                <img src={partner.logo} />
               </div>
               <div className="flex flex-col gap-3">
                 <div>{partner.name}</div>
@@ -28,14 +28,14 @@ const PartnerResults: React.FC = () => {
                 <a
                   target="_blank"
                   rel="noreferrer"
-                  className="hover:text-teal-400 active:text-teal-400 text-teal-500 font-bold"
+                  className="hover:text-primary active:text-primary text-primary_alt font-bold"
                   href={partner.link}
                 >
                   {partner.link}
                 </a>
               </div>
             </div>
-            {idx+1 < partnersQuery.data.length?<div className="border-b-2 border-teal-400"/>:<></>}
+            {idx + 1 < partnersQuery.data.length ? <div className="border-b-2 border-primary" /> : <></>}
           </div>
         )
       })}

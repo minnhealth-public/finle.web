@@ -1,0 +1,181 @@
+<button id="merge-sheet-to-db-button" class="dashboard-button" onclick="mergeSelectedRows('db')"  style="margin-top: 5px;">Merge (Sheet to DB)</button>
+<button id="merge-db-to-sheet-button" class="dashboard-button" onclick="mergeSelectedRows('sheet')"  style="margin-top: 5px;">Merge (DB to Sheet)</button>
+<div id="api-message" style="display: none; padding: 10px; margin-bottom: 10px;"></div>
+<table style="width: 100%" id="table-container">
+    <thead>
+        <tr>
+            <th style="width: 5%;">
+                <input type="checkbox" id="select-all" onclick="toggleSelectAll(this)">
+            </th>
+            <th style="width: 20%">Difference</th>
+            <th style="width: 35%">Database</th>
+            <th style="width: 35%">Spreadsheet</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in rows %}
+        <tr>
+            <td style="text-align: center;">
+                <input type="checkbox" class="row-checkbox" data-merge-action="{{ row.difference.merge_action }}" data-sheet-json="{{ row.sheet_json }}" data-db-json="{{ row.db_json }}">
+            </td>
+            <td>{{ row.difference.description|safe }}</td>
+            <td>{{ row.db_html|safe }}</td>
+            <td>{{ row.sheet_html|safe }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+<script>
+function toggleSelectAll(selectAllCheckbox) {
+    const checkboxes = document.querySelectorAll('.row-checkbox');
+    checkboxes.forEach(checkbox => checkbox.checked = selectAllCheckbox.checked);
+}
+
+function mergeSelectedRows(dest) {
+    const selectedRows = document.querySelectorAll('.row-checkbox:checked');
+    selectedRows.forEach(row => {
+        const mergeAction = row.getAttribute('data-merge-action');
+        const sheetJson = row.getAttribute('data-sheet-json');
+        const dbJson = row.getAttribute('data-db-json');
+        mergeData(dest, mergeAction, sheetJson, dbJson);
+    });
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function getClipDetails(data) {
+    return {
+        'name': data.name,
+        'video_id': data.video_id,
+        'speaker': data.speaker,
+        'type': data.type,
+        'start_time': data.start_time,
+        'end_time': data.end_time,
+        'parent': data.parent,
+        'topics': data.topics,
+        'motivational': data.motivational,
+        'instructional': data.instructional,
+        'relevancy': data.relevancy,
+        'tags': data.tags,
+        'key_takeaways': data.key_takeaways
+    }
+}
+
+function getVideoDetails(data) {
+    return {
+        'name': data.name,
+        'description': data.description,
+        'streaming_service': data.streaming_service,
+        'video_id': data.video_id,
+        'channel': data.channel,
+        'quality': data.quality,
+        'production_year': data.production_year,
+        'clips': data.clips,
+        'duration': data.duration
+    }
+}
+
+function getChannelDetails(data) {
+    return {
+        'name': data.name,
+        'description': data.description,
+        'videos': data.videos
+    }
+}
+
+function mergeData(dest, action, sheetData, dbData) {
+    const data = dest === 'db' ? JSON.parse(sheetData) : JSON.parse(dbData);
+    let postData = {'action': action}
+    switch(action) {
+        case 'AddChannel':
+            postData.source_refs = JSON.parse(dbData).source_refs
+            postData.details = getChannelDetails(data)
+            break;
+        case 'UpdateChannel':
+            postData.source_refs = JSON.parse(sheetData).source_refs
+            postData.details = getChannelDetails(data)
+            break;
+        case 'AddVideo':
+            postData.source_refs = JSON.parse(dbData).source_refs
+            postData.details = getVideoDetails(data)
+            break;
+        case 'UpdateVideo':
+            postData.source_refs = JSON.parse(sheetData).source_refs
+            postData.details = getVideoDetails(data)
+            break;
+        case 'AddClip':
+            postData.source_refs = JSON.parse(dbData).source_refs
+            postData.details = getClipDetails(data)
+            break;
+        case 'UpdateClip':
+            postData.source_refs = JSON.parse(sheetData).source_refs
+            postData.details = getClipDetails(data)
+            break;
+    }
+
+    postData.destination = dest
+
+    fetch('/admin/curator-audit/merge/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        credentials: 'include',
+        body: JSON.stringify(postData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        const messageElement = document.getElementById('api-message');
+
+        if (data.success) {
+            messageElement.textContent = 'Action was successful!';
+            messageElement.style.backgroundColor = 'green';
+            messageElement.style.color = 'white';
+            messageElement.style.display = 'block';
+
+            setTimeout(() => {
+                const compareAllDiv = document.getElementById('compare-call');
+                compareAllDiv.setAttribute('hx-get', '/admin/curator-audit/compare?loadSheet=0');
+                htmx.process(compareAllDiv);
+                compareAllDiv.dispatchEvent(new Event('load-database'));
+            }, 2000); // Trigger reload after 2 seconds
+        } else {
+            console.error('Error processing action:', data.error);
+
+            const formattedError = data.error.replace(/\n/g, '<br/>');
+
+            messageElement.innerHTML = 'Error processing action: ' + formattedError;
+            messageElement.style.backgroundColor = 'red';
+            messageElement.style.color = 'white';
+            messageElement.style.display = 'block';
+        }
+    })
+    .catch(error => {
+        console.error('Error processing action:', error);
+
+        const formattedError = error.replace(/\n/g, '<br/>');
+
+        const messageElement = document.getElementById('api-message');
+        messageElement.textContent = 'Error processing action: ' + formattedError;
+        messageElement.style.backgroundColor = 'red';
+        messageElement.style.color = 'white';
+        messageElement.style.display = 'block';
+    });
+}
+</script>

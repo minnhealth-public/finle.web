@@ -43,9 +43,21 @@ __ENV_MANIFEST = [
         allowed_values=[],
     ),
     EnvValue(
+        key="CSRF_TRUSTED_ORIGINS",
+        use_hint="Specifies the CSRF trusted origins for the app",
+        default="http://localhost:7654",
+        allowed_values=[],
+    ),
+    EnvValue(
         key="API_HOST",
         use_hint="Specifies the URL of the API's host",
-        default="http://localhost:8000",
+        default="http://localhost:7654",
+        allowed_values=[],
+    ),
+    EnvValue(
+        key="FRONT_END_HOST",
+        use_hint="Specifies the URL of the front end's host",
+        default="http://localhost:7654",
         allowed_values=[],
     ),
     EnvValue(
@@ -88,6 +100,37 @@ __ENV_MANIFEST = [
         key="SENTRY_URI",
         use_hint="Sentry URI for reporting application errors in production",
         default="invalid-uri",
+        allowed_values=[],
+    ),
+    # EMAIL SETTINGS
+    EnvValue(
+        key="EMAIL_HOST",
+        use_hint="The host for the email server",
+        default="localhost",
+        allowed_values=[],
+    ),
+    EnvValue(
+        key="EMAIL_PORT",
+        use_hint="Port for the email server",
+        default="1025",
+        allowed_values=[],
+    ),
+    EnvValue(
+        key="EMAIL_HOST_USER",
+        use_hint="The user for the host email server",
+        default="",
+        allowed_values=[],
+    ),
+    EnvValue(
+        key="EMAIL_HOST_PASSWORD",
+        use_hint="The password for the email host provider",
+        default="",
+        allowed_values=[],
+    ),
+    EnvValue(
+        key="EMAIL_USE_TLS",
+        use_hint="Whether to use TLS for the email server",
+        default=False,
         allowed_values=[],
     ),
 ]
@@ -147,6 +190,13 @@ def env_get_allowed_origins() -> List[str]:
     """Assemble a tuple of allowed origins from the raw environment variable string."""
     # Note: the raw list is expected to be a comma-separated string but may be only one value
     raw_value = env_get_raw_value("CORS_ALLOWED_ORIGINS")
+    return _comma_separated_strings_to_list(raw_value)
+
+
+def env_get_csrf_trusted_origins() -> List[str]:
+    """Assemble a tuple of CSRF trusted origins from the raw environment variable string."""
+    # Note: the raw list is expected to be a comma-separated string but may be only one value
+    raw_value = env_get_raw_value("CSRF_TRUSTED_ORIGINS")
     return _comma_separated_strings_to_list(raw_value)
 
 

@@ -25,6 +25,7 @@ navigating to your working directory and issuing a clone command:
 `git clone git@github.com:minnhealth-public/finle.web.git`
 
 ### Python 3.11.x
+
 This project is based on Python 3.11. You may install the latest version of Python 3.11.x from here:
 
 https://www.python.org/downloads/release/python-3117/
@@ -59,13 +60,11 @@ Create your local virtual environment with the built-in Python 3 `venv` tool, th
 
 #### Windows
 `C:\Users\<user>\AppData\Local\Programs\Python\Python311\python.exe -m venv ./finle-311`
-
-`.\finle-311\Scripts\Activate.ps1`
+PowerShell: `.\finle-311\Scripts\Activate.ps1`
 
 #### Mac
 `python -m venv ./finle-311`
-
-`source ./finle-311/bin/activate`
+Bash: `source ./finle-311/bin/activate`
 
 Now that the virtual environment is activated you should see `(finle-311)` as a prefix to your shell prompt. The local
 venv is pointing to your Python installation so you no longer need to use long paths to run the correct version of
@@ -88,6 +87,7 @@ Next, create an admin superuser and follow the command line prompts to enter dat
 
 
 ## Run Pytests
+
 Run the local pytest suite to make sure that the install completed properly. There are a few ways this can be done:
 
 ### PyCharm
@@ -95,6 +95,7 @@ You can check the pytest configuration directly from the PyCharm pytest run conf
 
 
 ### Locally
+
 The pytest suite can be run directly from a local environment (virtual or otherwise) from the project root directory:
 
 `python -m pytest -v --ds=webapp.settings --cov`
@@ -102,21 +103,25 @@ The pytest suite can be run directly from a local environment (virtual or otherw
 ## Run the Webserver
 
 ### PyCharm
+
 Start up the local web server via the PyCharm configuration by clicking the "run" button next to your run
 configuration. Follow the prompts to view the web page.
 
 ### Local Environment
-From your local activated virtual environment, navigate to the `webapp` directory and run:
 
+From your local activated virtual environment, navigate to the `webapp` directory and run:
+`python manage.py collectstatic`
 `python manage.py runserver 127.0.0.1:8000`
 
 Note that you will need a PostgreSQL instance running with the standard 5432 port open for the Django server to
 run properly.
 
 ## Access the Webserver
+
 After the webserver has been launched as described above, you can access the frontend and backend endpoints:
 
 ### Django Backend
+
 The django based API backend is available here: http://127.0.0.1:8000/
 
 The django based admin pages are available here: http://127.0.0.1:8000/admin and logging in
@@ -125,9 +130,11 @@ As long as your local postgres instance is running with port 5432 exposed this s
 work for you. Similarly, if you are on Mac or Linux you could add an entry into your `/etc/hosts` file.
 
 #### PSYCOPG2 Tweak
+
 If you get a `django.core.exceptions.ImproperlyConfigured` exception with the `Error loading psycopg module:
 No module named psycopg` message, then run `pip install psycopg2-binary` inside the virtual environment per
 [SaeX's SO post](https://stackoverflow.com/a/22423419).
 
 ### React Frontend
+
 The react based frontend is avalable here: http://127.0.0.1:3000

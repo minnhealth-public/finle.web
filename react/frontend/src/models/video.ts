@@ -1,13 +1,22 @@
 interface Video {
-    id: string;
-    name: string;
-    description: string;
-    video: string;
-    end_time: number;
-    start_time: number;
-    longer_clip: string;
-    entire_clip: string;
-    topics_addressed: string[];
+  id: number;
+  name: string;
+  video: string;
+  type: string;
+  videoUrl: string;
+  endTime: number;
+  startTime: number;
+  longerClip?: Video;
+  entireClip?: Video;
+  relatedClips?: Video[];
+  topicsAddressed: number[];
+  keyTakeaways: any[];
+  tags: number[];
+  tasks: any[];
+  saved: boolean;
+  watched: boolean;
+  watchedTimestamp: string;
+  rating: number;
 }
 
 export default Video;

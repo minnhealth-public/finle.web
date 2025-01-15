@@ -3,7 +3,7 @@ import { fireEvent, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import GlossaryResults from './GlossaryResults';
 import { renderWithClient, renderWithRouter } from '../../testUtils';
-import * as ReactDOM  from 'react-router-dom';
+import * as ReactDOM from 'react-router-dom';
 import { GlossaryItem } from '../../models';
 
 jest.mock('../../api/glossary', () => ({
@@ -11,15 +11,15 @@ jest.mock('../../api/glossary', () => ({
 }));
 
 const mockGlossary = [
-  { id: 1, term: 'TestTerm1', definition: 'TestDefinition1', source: 'TestSource1', related_terms: [] as GlossaryItem[], related_clips: [] as string[]},
-  { id: 2, term: 'TestTerm2', definition: 'TestDefinition2', source: 'TestSource2', related_terms: [] as GlossaryItem[], related_clips: [] as string[]},
+  { id: 1, term: 'TestTerm1', definition: 'TestDefinition1', source: 'TestSource1', related_terms: [] as GlossaryItem[], related_clips: [] as string[] },
+  { id: 2, term: 'TestTerm2', definition: 'TestDefinition2', source: 'TestSource2', related_terms: [] as GlossaryItem[], related_clips: [] as string[] },
 ];
 
 describe('GlossaryResults', () => {
   it('renders loading state', async () => {
     jest.spyOn(require('../../api/glossary'), 'getGlossary').mockResolvedValueOnce(mockGlossary);
     renderWithClient(renderWithRouter(<GlossaryResults />));
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByText('...')).toBeInTheDocument();
   });
 
   it('renders error state', async () => {

@@ -1,63 +1,44 @@
-import React, { useContext } from 'react';
+import React, { useEffect } from 'react';
 import { Modal } from '../shared/View';
-import AuthContext from '../contexts/AuthContext';
-import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import MainPagePreAuth from './MainPagePreAuth';
+import LoginForm from '../shared/Form/LoginForm';
+import { useStore } from '../store';
+import SSOLogins from '../components/SSOLogins';
 
 const LoginPage = () => {
 
-  let {loginUser, user} = useContext(AuthContext);
+  let { user } = useStore();
+  const navigate = useNavigate()
 
-  const handleLogin = async (event: any) => {
-    // Trigger the login mutation
-    event.preventDefault();
-    loginUser.mutate({ email:event.target.email.value, password:event.target.password.value });
-  };
-
-  if (user) {
-    return <Navigate to='/shorts'></Navigate>
-  }
+  useEffect(() => {
+    if (user && user.lastLogin) {
+      navigate('/videos')
+    } else if (user) {
+      navigate('/todos')
+    }
+  }, [user])
 
   return (
-    <Modal isOpen onClose={() => {}} disableClose={true}>
-    <div className="flex items-center justify-center ">
-      <div className="max-w-md w-full p-8">
-        <h2 className="text-4xl text-blue-450">Login</h2>
-        <form className="space-y-4" onSubmit={handleLogin}>
-          <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-600">
-              Email
-            </label>
-            <input
-              type="text"
-              id="email"
-              className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-              placeholder="Enter your email"
-            />
+    <>
+      <MainPagePreAuth></MainPagePreAuth>
+      <Modal open onClose={() => { navigate('/'); }}>
+        <div className="md:flex justify-center items-stretch ">
+          <div className="p-4">
+            <h2 className="md:text-6xl text-4xl text-header">Login</h2>
+            <LoginForm></LoginForm>
           </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-600">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-              placeholder="Enter your password"
-            />
+          <div className="flex flex-col align-middle md:pt-16 mb-4">
+            <div className="border-l flex-grow m-auto mb-2 "></div>
+            <div className="text-s md:pl-0 pl-4">or</div>
+            <div className="border-l flex-grow m-auto mt-2"></div>
           </div>
-          <div>
-            <button
-              type="submit"
-              className="text-sm uppercase bg-teal-500 hover:bg-teal-400 rounded-md py-2 px-12 text-white-1"
-              disabled={loginUser.isPending}
-            >
-              {loginUser.isPending? 'Logging in...' : 'Log In'}
-            </button>
+          <div className="md:mt-[3.75rem] p-4 md:pt-4 pt-0 ">
+            <SSOLogins />
           </div>
-        </form>
-      </div>
-    </div>
-    </Modal>
+        </div>
+      </Modal>
+    </>
   );
 };
 

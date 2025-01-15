@@ -7,6 +7,7 @@ from app_web.env import (
 )
 
 
+@pytest.mark.django_db()
 class TestEnv:
     def test_validator(self):
         rtn = validate_env()

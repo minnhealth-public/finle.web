@@ -1,14 +1,14 @@
 import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDesktop } from '@fortawesome/free-solid-svg-icons';
 import { GlossaryItem } from '../../models';
 import { useSearchParams } from 'react-router-dom';
+import DesktopIcon from '../../shared/Icon/DesktopIcon';
 
 interface GlossaryListItemProps {
-  item : GlossaryItem;
+  item: GlossaryItem;
+  idx: number;
 }
 
-const GlossaryListItem: React.FC<GlossaryListItemProps> = ({ item }) => {
+const GlossaryListItem: React.FC<GlossaryListItemProps> = ({ item, idx }) => {
 
   let [searchParams, setSearchParams] = useSearchParams();
 
@@ -19,11 +19,13 @@ const GlossaryListItem: React.FC<GlossaryListItemProps> = ({ item }) => {
 
   return (
     <button
-      className="text-left flex flex-row items-center gap-3 hover:text-teal-400 active:text-teal-400 cursor-pointer"
+      className="text-left flex flex-row items-center gap-3 hover:text-primary active:text-primary cursor-pointer"
       onClick={() => setActiveTerm()}>
-      <div className="">{item.term}</div>
-      {item.related_clips.length > 0 &&
-      <FontAwesomeIcon data-testid="desktop-icon" icon={faDesktop} className="mr-2 w-4" />
+      <div id={`term-${idx}`} className="text-lg">{item.term}</div>
+      {item.relatedClips.length > 0 &&
+        <div data-testid="desktop-icon" className="mr-2 w-4">
+          <DesktopIcon />
+        </div>
       }
     </button>
   );
